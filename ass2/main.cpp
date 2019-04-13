@@ -62,6 +62,25 @@ for(int i =0;i<grid_rows ;i++){
 
 
 }
+//gridfixer
+void OperatorGrid::Gridfixer(int number){
+
+    for(int i =0;i<grid_rows ;i++){
+        for(int j=0;j<grid_cols;j++){
+
+        if(tgrid[i][j]==number)
+            tgrid[i][j]=0;
+        if(tgrid[i][j]==0)
+            grid[i][j]='0';
+        }
+
+        }
+
+}
+
+
+
+
 
 OperatorGrid::~OperatorGrid(){
 
@@ -76,7 +95,8 @@ delete [] grid;
 bool OperatorGrid::place_operator( ArithmeticOperator *A){
     num_operators+=1;
     operators[num_operators]=A;
-
+    int bordererror=0;
+    int conflicterror=0;
 
     int tempx =  A->get_x()-1;
     int tempy =A->get_y()-1;
@@ -86,116 +106,359 @@ bool OperatorGrid::place_operator( ArithmeticOperator *A){
 
 if(A->get_sign()=='-'){ //minus
 
-    grid[tempx][tempy]= A->get_sign();
-    tgrid[tempx][tempy]=num_operators;
+
+    for(int i = 0 ; i<tempsize+1;i++){
 
 
+            if (tempy+i+1<=grid_cols){//sağa bakma
+                if(tgrid[tempx][tempy+i]==0){
+                    tgrid[tempx][tempy+i]= num_operators;
+                    grid[tempx][tempy+i]= A->get_sign();
+
+                }
+                else if(tgrid[tempx][tempy+i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+            }
+            else{
+                bordererror+=1 ;
+            }
+            if (tempy-i+1>=0){//sola bakma
+
+                if(i==0)
+                    continue;
+                else if(tgrid[tempx][tempy-i]==0){
+
+                    tgrid[tempx][tempy-i]= num_operators;
+                    grid[tempx][tempy-i]= A->get_sign();
 
 
-    for(int i = tempsize ; 0<i;i--){
+                }
+                else if(tgrid[tempx][tempy-i]!=0 || tgrid[tempx][tempy-i]!=num_operators ) {
+                    conflicterror+=1;
 
-    if((tempy+i+1>grid_cols||tempy-i+1<0) && (tgrid[tempx][tempy+i]!=0 ||tgrid[tempx][tempy-i]!=0)){
-        cout<<"border error+conflict"<<endl;
-        grid[tempx][tempy]='0';
-        tgrid[tempx][tempy]=0;
+                }
 
-        return false;
-    }
+            }
+            else{
 
-    grid[tempx][tempy+i]= A->get_sign();
-    grid[tempx][tempy-i]= A->get_sign();
-    tgrid[tempx][tempy+i]= num_operators;
-    tgrid[tempx][tempy-i]= num_operators;
-
-    }
+                bordererror+=1 ;
+            }
+        }
 
 
-    return true;
     }
 else if(A->get_sign()=='/'){//divison
 
-    /*if(tempy+tempsize+1>grid_cols || tempy-tempsize+1<0||tempx+tempsize+1>grid_rows||tempx-tempsize+1<0){
-        cout<<"Border error"<<endl;
-        return false ;
+    for(int i = 0 ; i<tempsize+1;i++){
+         if (tempy+i+1<=grid_cols&&tempx-i+1>=0){//sağ çapraz bakma
+                if(tgrid[tempx-i][tempy+i]==0){
+                    tgrid[tempx-i][tempy+i]= num_operators;
+                    grid[tempx-i][tempy+i]= A->get_sign();
 
-    }*/
+                }
+                else if(tgrid[tempx-i][tempy+i]!=0) {
+                    conflicterror+=1;
 
-    grid[tempx][tempy]= A->get_sign();
-    tgrid[tempx][tempy]=num_operators;
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
 
 
-    for(int i = A->get_size() ; 0<i;i--){
+        if (tempy-i+1>=0&&tempx+i+1<=grid_rows){//sol çapraz bakma
 
-    grid[tempx-i][tempy+i]= A->get_sign();
-    grid[tempx+i][tempy-i]= A->get_sign();
+                if(i==0)
+                    continue;
+                else if(tgrid[tempx+i][tempy-i]==0){
+                    tgrid[tempx+i][tempy-i]= num_operators;
+                    grid[tempx+i][tempy-i]= A->get_sign();
 
-    tgrid[tempx-i][tempy+i]= num_operators;
-    tgrid[tempx+i][tempy-i]= num_operators;
+                }
+                else if(tgrid[tempx+i][tempy-i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
 
 
     }
+
+
+
     }
 else if(A->get_sign()=='+'){//plus
-    if(tempy+tempsize+1>grid_cols || tempy-tempsize+1<0||tempx+tempsize+1>grid_rows||tempx-tempsize+1<0){
-        cout<<"Border error"<<endl;
-        return false ;
+
+
+    for(int i = 0 ; i<tempsize+1;i++){
+        if (tempy+1<=grid_cols&&tempx-i+1>0){// yukarı  bakma
+                if(tgrid[tempx-i][tempy]==0){
+                    tgrid[tempx-i][tempy]= num_operators;
+                    grid[tempx-i][tempy]= A->get_sign();
+
+                }
+                else if(tgrid[tempx-i][tempy]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
+        if (tempy-i+1>0 &&tempx+1>0){//  sol  bakma
+
+                if(i==0)
+                    continue;
+
+                else if(tgrid[tempx][tempy-i]==0){
+                    tgrid[tempx][tempy-i]= num_operators;
+                    grid[tempx][tempy-i]= A->get_sign();
+
+                }
+                else if(tgrid[tempx][tempy-i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
+
+        if (tempy+1>0&&tempx+i+1<=grid_rows){//aşağı  bakma
+
+                if(i==0)
+                    continue;
+                else if(tgrid[tempx+i][tempy]==0){
+                    tgrid[tempx+i][tempy]= num_operators;
+                    grid[tempx+i][tempy]= A->get_sign();
+
+                }
+                else if(tgrid[tempx+i][tempy]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
+        if (tempy+i+1<=grid_cols&&tempx+1<=grid_rows){// sağ  bakma
+
+                if(i==0)
+                    continue;
+                else if(tgrid[tempx][tempy+i]==0){
+                    tgrid[tempx][tempy+i]= num_operators;
+                    grid[tempx][tempy+i]= A->get_sign();
+
+                }
+                else if(tgrid[tempx][tempy+i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
+
+
+
 
     }
 
-    grid[A->get_x()-1][A->get_y()-1]= A->get_sign();
-    tgrid[tempx][tempy]=num_operators;
-
-    for(int i = A->get_size() ; 0<i;i--){
-
-    grid[tempx][tempy+i]= A->get_sign();
-    grid[tempx][tempy-i]= A->get_sign();
-    grid[tempx+i][tempy]= A->get_sign();
-    grid[tempx-i][tempy]= A->get_sign();
-
-    tgrid[tempx][tempy+i]= num_operators;
-    tgrid[tempx][tempy-i]= num_operators;
-    tgrid[tempx+i][tempy]= num_operators;
-    tgrid[tempx-i][tempy]= num_operators;
-
-    }
     }
 //ÇARP
 else if(A->get_sign()=='x'){
-    if(tempy+tempsize+1>grid_cols || tempy-tempsize+1<0||tempx+tempsize+1>grid_rows||tempx-tempsize+1<0){
-        cout<<"Border error"<<endl;
-        return false ;
+    for(int i = 0 ; i<tempsize+1;i++){
+        if (tempy+i+1<=grid_cols&&tempx-i+1>0){// yukarı sağ çapraz bakma
+                if(tgrid[tempx-i][tempy+i]==0){
+                    tgrid[tempx-i][tempy+i]= num_operators;
+                    grid[tempx-i][tempy+i]= A->get_sign();
+
+                }
+                else if(tgrid[tempx-i][tempy+i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
+        if (tempy-i+1>=0 &&tempx-i+1>0){// yukarı sol çapraz bakma
+
+                if(i==0)
+                    continue;
+
+                else if(tgrid[tempx-i][tempy-i]==0){
+                    tgrid[tempx-i][tempy-i]= num_operators;
+                    grid[tempx-i][tempy-i]= A->get_sign();
+
+                }
+                else if(tgrid[tempx-i][tempy-i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
+
+        if (tempy-i+1>0&&tempx+i+1<=grid_rows){//aşağı sol çapraz bakma
+
+                if(i==0)
+                    continue;
+                else if(tgrid[tempx+i][tempy-i]==0){
+                    tgrid[tempx+i][tempy-i]= num_operators;
+                    grid[tempx+i][tempy-i]= A->get_sign();
+
+                }
+                else if(tgrid[tempx+i][tempy-i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
+        if (tempy+i+1<=grid_cols&&tempx+i+1<=grid_rows){//aşağı sağ çapraz bakma
+
+                if(i==0)
+                    continue;
+                else if(tgrid[tempx+i][tempy+i]==0){
+                    tgrid[tempx+i][tempy+i]= num_operators;
+                    grid[tempx+i][tempy+i]= A->get_sign();
+
+                }
+                else if(tgrid[tempx+i][tempy+i]!=0) {
+                    conflicterror+=1;
+
+                }
+
+        }
+        else{
+            bordererror+=1 ;
+        }
+
 
     }
 
-    grid[tempx][tempy]= A->get_sign();
-    tgrid[tempx][tempy]=num_operators;
-
-    for(int i = A->get_size() ; 0<i;i--){
-
-    grid[tempx+i][tempy+i]= A->get_sign();
-    grid[tempx-i][tempy+i]= A->get_sign();
-    grid[tempx+i][tempy-i]= A->get_sign();
-    grid[tempx-i][tempy-i]= A->get_sign();
-
-    tgrid[tempx+i][tempy+i]= num_operators;
-    tgrid[tempx-i][tempy+i]= num_operators;
-    tgrid[tempx+i][tempy-i]= num_operators;
-    tgrid[tempx-i][tempy-i]= num_operators;
-
-
-    }
 
 }
 
 
+if(bordererror!=0&& conflicterror!=0 ){
+    cout<<"border+conflict error"<<endl;
+    this->Gridfixer(num_operators);
+    num_operators-=1;
+    return false;
 
+}
+else if(bordererror!=0){
+    cout<<"border error"<<endl;
+    this->Gridfixer(num_operators);
+    num_operators-=1;
+    return false;
+}
+else if(conflicterror!=0){
+    cout<<"conflict error"<<endl;
+    this->Gridfixer(num_operators);
+    num_operators-=1;
+    return false;
+}
 
 
 
 return true;
 
 }
+bool OperatorGrid:: move_operator (int x,int y ,char direction,int move_by){
 
+    int n_operator  = tgrid[x-1][y-1];
+    int tempxcenter = operators[n_operator]->get_x();
+
+    int tempycenter =operators[n_operator]->get_y();
+
+    this->Gridfixer(n_operator);
+
+    if(direction=='U'){
+        operators[n_operator]->set_x(tempxcenter-move_by);
+        if(this->place_operator(operators[n_operator])==false){
+            n_operator-=1;
+            operators[n_operator]->set_x(tempxcenter);
+            this->place_operator(operators[n_operator]);
+
+
+        }
+
+
+    }
+   else if(direction=='D'){
+        operators[n_operator]->set_x(tempxcenter+move_by);
+        if(this->place_operator(operators[n_operator])==false){
+            n_operator-=1;
+            operators[n_operator]->set_x(tempxcenter);
+            this->place_operator(operators[n_operator]);
+
+
+        }
+
+
+    }
+    else if(direction=='R'){
+        operators[n_operator]->set_y(tempycenter+move_by);
+        if(this->place_operator(operators[n_operator])==false){
+            n_operator-=1;
+            operators[n_operator]->set_y(tempxcenter);
+            this->place_operator(operators[n_operator]);
+
+
+        }
+
+
+    }
+    else if(direction=='L'){
+        operators[n_operator]->set_y(tempycenter-move_by);
+        if(this->place_operator(operators[n_operator])==false){
+            n_operator-=1;
+            operators[n_operator]->set_y(tempxcenter);
+            this->place_operator(operators[n_operator]);
+
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+}
 
 //Operator Class
 Operator ::Operator(int x ,int y ,int size){
@@ -264,16 +527,18 @@ return sign;
 
 int main(){
 
-OperatorGrid B(10,10);
+OperatorGrid B(5,5);
 
 
-ArithmeticOperator A(4,4,2,'x');
-ArithmeticOperator K(5,4,2,'-');
-ArithmeticOperator *Y=&A;
 
-B.place_operator(Y);
+ArithmeticOperator K(3,3,1,'-');
+ArithmeticOperator L(2,3,1,'-');
 
+B.place_operator(&L);
 B.place_operator(&K);
+B.printer();
+
+B.move_operator(3,2,'R',1);
 B.printer();
 
 
