@@ -10,11 +10,13 @@ class OperatorGrid
         ~OperatorGrid();
 
         bool place_operator (ArithmeticOperator*);
+        bool copyplace_operator (ArithmeticOperator*,int number);
         void printer();
-       /* bool move_operator (int x,int y ;char direction,int move_by);
-        void print_operators;
+        void Gridfixer( int number);
+        bool move_operator (int x,int y ,char direction,int move_by);
+       // void print_operators;
 
-*/
+
     private:
         int MAX_OPERATOR_SIZE;
         int grid_rows;
