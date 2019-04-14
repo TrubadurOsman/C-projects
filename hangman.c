@@ -26,7 +26,7 @@ printf("%s \n",x) ;
 
 int main(){
 	
-	char name[] = "kayra" ;	//UNKOWN WORD
+	char name[] = "kayraaa" ;	//UNKOWN WORD
 	
 	char x[] ="<<<<<";
 	int point = 0 ;
